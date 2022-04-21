@@ -226,7 +226,6 @@ def divide_ratings(sport_unique, sports, scores):
     for sport in sport_unique:
         scores_per_sport = []
         for i, row in enumerate(sports):
-            print(row)
             if sport in row:
                 scores_per_sport.append(scores[i])
         total_scores.append(scores_per_sport)
