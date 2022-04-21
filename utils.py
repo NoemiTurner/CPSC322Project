@@ -14,7 +14,6 @@ def discritize_data_by_million(table):
         if row[money_index] < 95:
             y.append("medium")
         y.append("high")
-        
     return y
 
 def get_column(table, header, col_name):
