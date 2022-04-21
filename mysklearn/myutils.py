@@ -247,3 +247,6 @@ def find_max(values):
             max_val = values[index]
             max_index = index
     return max_index
+
+def compute_euclidean_distance(v1, v2):
+    return math.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
