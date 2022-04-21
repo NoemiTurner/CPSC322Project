@@ -1,16 +1,21 @@
 import numpy as np
 import math
 
-def order_data_by_million(table):
+def discritize_data_by_million(table):
     """
     This function takes in a table and returns a
     sorted table by the number of million in descending order.
     """
-    money_index = table.column_names.index("earning_($ million)")
-    sorted_table = table.copy()
+    money_index = table.column_names.index("earnings_($ million)")
+    y = []
     for row in table.data:
-        pass
-    return sorted_table
+        if row[money_index] < 50:
+            y.append("low")
+        if row[money_index] < 95:
+            y.append("medium")
+        y.append("high")
+        
+    return y
 
 def get_column(table, header, col_name):
     """ Get a column
