@@ -1,8 +1,7 @@
 # TODO: your reusable general-purpose functions here
+import math
 import numpy as np
-from math import sqrt
 from math import pi
-from math import exp
 
 def randomize_in_place(alist, parallel_list=None):
     for i in range(len(alist)):
@@ -248,5 +247,5 @@ def find_max(values):
             max_index = index
     return max_index
 
-def compute_euclidean_distance(v1, v2):
+def compute_euclidian_distance(v1, v2):
     return math.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
