@@ -302,4 +302,3 @@ class MyNaiveBayesClassifier:
             indexes = myutils.find_max(posts)
             y_predicted.append(indexes)
         return y_predicted
-

@@ -249,3 +249,25 @@ def find_max(values):
 
 def compute_euclidian_distance(v1, v2):
     return math.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
+
+def get_most_common(col):
+    """ Get the frequencies in a certain column
+    Args:
+        col (list): the column to be searched
+    Returns:
+        values[max_count] (item in list): value in list that is the max occurances
+    """
+    for item in col:
+        col[col.index(item)] = str(item)
+    col.sort() # inplace 
+    # parallel lists
+    values = []
+    counts = []
+    for value in col:
+        if value in values: # seen it before
+            counts[-1] += 1 # okay because sorted
+        else: # haven't seen it before
+            values.append(value)
+            counts.append(1)
+    max_count = counts.index(max(counts))
+    return values[max_count]
