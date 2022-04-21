@@ -215,7 +215,7 @@ def split_string_count(col: list):
     #print(split_column)
     return split_column
 
-def divide_ratings(genre_unique, genres, scores):
+def divide_ratings(sport_unique, sports, scores):
     """ Get the frequencies in a certain column
     Args:
         
@@ -223,10 +223,11 @@ def divide_ratings(genre_unique, genres, scores):
         
     """
     total_scores = []
-    for genre in genre_unique:
-        scores_per_genre = []
-        for row in genres:
-            if genre in row:
-                scores_per_genre.append(scores[genres.index(row)])
-        total_scores.append(scores_per_genre)
+    for sport in sport_unique:
+        scores_per_sport = []
+        for i, row in enumerate(sports):
+            print(row)
+            if sport in row:
+                scores_per_sport.append(scores[i])
+        total_scores.append(scores_per_sport)
     return total_scores
