@@ -1,5 +1,4 @@
 from mysklearn import myutils
-from mysklearn import myutils
 import numpy as np
 import math
 

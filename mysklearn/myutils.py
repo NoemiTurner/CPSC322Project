@@ -4,6 +4,16 @@ from math import sqrt
 from math import pi
 from math import exp
 
+def randomize_in_place(alist, parallel_list=None):
+    for i in range(len(alist)):
+        # generate a random index to swap this value at i with
+        rand_index = np.random.randint(0, len(alist)) # rand int in [0, len(alist))
+        # do the swap
+        alist[i], alist[rand_index] = alist[rand_index], alist[i]
+        if parallel_list is not None:
+            parallel_list[i], parallel_list[rand_index] =\
+                parallel_list[rand_index], parallel_list[i]
+                
 def get_tp_fp(y_true, y_pred, pos_label):
     """
     Given a list of true labels and a list of predicted labels, return the true positives, true negatives, false positives, and false negatives
