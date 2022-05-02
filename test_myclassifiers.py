@@ -23,6 +23,8 @@ X_TRAIN_INTERVIEW = [
 Y_TRAIN_INTERVIEW = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
 
 def test_random_forest_classifier_fit():
+    rfc = MyRandomForestClassifier()
+    
     assert False is True # TODO: fix this
 
 def test_random_forest_classifier_predict():

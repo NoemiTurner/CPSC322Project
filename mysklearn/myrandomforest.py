@@ -1,7 +1,5 @@
 from mysklearn import myutils
 
-# TODO: copy your myclassifiers.py solution from PA4-6 here
-
 class MyRandomForestClassifier:
     """Represents a random forest classifier.
     Attributes:
