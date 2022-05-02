@@ -253,7 +253,6 @@ class MyNaiveBayesClassifier:
 
         # frequencies returns a list of y values in alphabetical order and corresponding frequencies
         frequencies = myutils.get_frequencies(y_train.copy())
-        print(len(frequencies[0]))
         for index in range(len(frequencies[0])):
             priors.append(frequencies[1][index] / len(y_train))
             posts.append({})
