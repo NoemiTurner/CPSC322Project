@@ -255,7 +255,8 @@ class MyNaiveBayesClassifier:
         frequencies = myutils.get_frequencies(y_train.copy())
         for index in range(len(frequencies[0])):
             priors.append(frequencies[1][index] / len(y_train))
-            posts.append([])
+            posts.append({})
+        
         self.priors = priors
         group_indexes = myutils.group_by_multiple_atts(indexes, y_train)
         index = 0
@@ -264,7 +265,9 @@ class MyNaiveBayesClassifier:
             for row in attribute_values:
                 for name in row:
                     count = myutils.get_num_instances(name, item, myutils.get_column(X_train, index_j))
-                    posts[index].append(count/len(item))
+                    posts[index].update({name: (count/len(item))})
+                    
+                
                 index_j += 1
             index_j = 0
             index += 1
@@ -284,7 +287,6 @@ class MyNaiveBayesClassifier:
         y_predicted = []
         posts = []
         indexes = []
-        predicts = []
 
         for item in X_test:
             posts = []
