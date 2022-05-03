@@ -361,13 +361,7 @@ class MyDecisionTreeClassifier:
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         available_attributes = headert.copy()
         self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
-        # self.X_train = X_train
-        # self.y_train = y_train
-        # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
-        # main_header.append("class") # Make the class column parallel with the y_train column
-        # main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        # self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
- 
+        
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
  
@@ -378,10 +372,6 @@ class MyDecisionTreeClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-        # y_predicted = []
-        # for test_instance in X_test:
-        #     y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
-        # return y_predicted
         header = []
         for i in range(len(X_test[0])):
             att_num = str(i)
@@ -402,9 +392,6 @@ class MyDecisionTreeClassifier:
             class_name(str): A string to use for the class name in the decision rules
                 ("class" if a string is not provided and the default name "class" should be used).
         """
-        # if attribute_names is None:
-        #     attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
-        # myutils.print_decision_rules_helper(self.tree)
         myutils.print_tree_helper(self.tree, [], self.tree[0])
  
     # BONUS method

@@ -271,3 +271,106 @@ def get_most_common(col):
             counts.append(1)
     max_count = counts.index(max(counts))
     return values[max_count]
+
+def partition_instances(instances, split_attribute, header):
+    # lets use a dictionary
+    partitions = {}
+    att_index = int(split_attribute)
+    att_domain = header[att_index]
+    for att_value in att_domain:
+        partitions[att_value] = []
+        # TODO: finish
+        for instance in instances:
+            if instance[att_index] == att_value:
+                partitions[att_value].append(instance)
+    return partitions
+
+def select_attribute(instances, attributes, header):
+    #TODO: use entropy to compute and choose the attribute with the smallest Enew
+    # for now we will choose randomly
+    # get the domain of y
+    y = []
+    for item in instances:
+        if item[-1] not in y:
+            y.append(item[-1])
+    # get the index of instances left
+    index_list = []
+    for item in attributes:
+        index_list.append(int(item[3:]))
+    # find the lowest Enew for each attribute
+    Enew = []
+    for i in range(len(attributes)):
+        Enew_sum = 0
+        for dom in header[attributes[i]]:
+            nums = []
+            for y_dom in y:
+                nums.append(0)
+            for j in range(len(instances)):
+                if instances[j][index_list[i]] == dom:
+                    nums[y.index(instances[j][-1])] += 1
+            E = 0
+            for num in nums:
+                if num == 0:
+                    E = 0
+                    break
+                e += (num/sum(nums)) * math.log(num/sum(nums), 2)
+            E *= -1
+            weight = sum(nums)/len(instances)
+            Enew_sum += E*weight
+        Enew.append(Enew_sum)
+    index = Enew.index(min(Enew))
+    return attributes[index]
+
+def all_same_class(instances):
+    # returns true if all instances have the same class label
+    for instance in instances:
+        if instance[-1] != instances[0][-1]:
+            return False
+    return True
+
+def tdidt(current_instances, available_attributes):
+    # basic approach (uses recursion!!):
+    print("available attributes", available_attributes)
+
+    # select an attribute to split on
+    attribute = select_attribute(current_instances, available_attributes)
+    print("splitting on attribute: ", attribute)
+    available_attributes.remove(attribute)
+    tree = ["Attribute", attribute]
+    # group data by attribute domains (creates pairwise disjoint partitions)
+    # group by attribute domain
+    partitions = partition_instances(current_instances, attribute)
+    # for each partition, repeat unless one of the following occurs (base case)
+    for att_value, att_partition in partitions.items():
+        print("current attribute value", att_value, len(att_partition))
+        value_subtree = ["Value", att_value]
+    #    CASE 1: all class labels of the partition are the same => make a leaf node
+        if len(att_partition) > 0 and all_same_class(att_partition) == True:
+            #all same class returns true if they have the same class label
+            print("Case 1 all same class")
+            # TODO: fix the last 2 input numbers
+            value_subtree.append(["Leaf", att_partition[0][-1], len(att_partition), len(current_instances)])
+    #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
+        elif len(att_partition) > 0 and  len(available_attributes) == 0:
+            print("Case 2 no more attributes")
+            # TODO: we have a mix of class labels, handle clash with majority vote leaf node
+            majority_vote = get_frequencies(att_partition)
+            value_subtree.append(["Leaf", majority_vote, len(att_partition), len(current_instances)])
+            tree.append(value_subtree)
+            # count the number of True and False class labels and choose the one with the most votes
+
+    #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
+        elif len(att_partition) == 0:
+            print("Case 3 empty partition")
+            # TODO: backtrack to replace the attribute node with a majority vote leaf node
+            # replace tree = ["Attribute", attribute] with a majority vote
+            majority_vote = get_frequencies(current_instances)
+            leaf = ["Leaf", majority_vote, len(current_instances), len(current_instances)]
+            return leaf
+        else: # the previous conditions were all false, recurse
+            subtree = tdidt(att_partition, available_attributes.copy())
+            value_subtree.append(subtree)
+            # note the copy
+        value_subtree.append(subtree)
+
+    return tree
