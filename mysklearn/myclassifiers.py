@@ -114,7 +114,7 @@ class MyKNeighborsClassifier:
         distances = []
         all_distances = []
         neighbor_indices = []
-        neighbor_indices = []
+        toneighbor_indices = []
         # Calculates all X_train distances from the test instance
         for test_instance in X_test:
             for i, train_coordinates in enumerate(self.X_train):
@@ -127,12 +127,11 @@ class MyKNeighborsClassifier:
                 neighbor_indices.append(neighbor[0])
                 distances.append(neighbor[1])
             all_distances.append(distances)
-            neighbor_indices.append(neighbor_indices)
+            toneighbor_indices.append(neighbor_indices)
             distances = []
             neighbor_indices = []
             neighbors = []
-        print(all_distances, neighbor_indices)
-        return all_distances, neighbor_indices
+        return all_distances, toneighbor_indices
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -147,11 +146,10 @@ class MyKNeighborsClassifier:
         neighbor_votes = []
         y_predicted = []
         knn_distances, knn_indexes = self.kneighbors(X_test)
-        print(len(knn_indexes))
         for i, test_instance in enumerate(X_test):
             for index in knn_indexes[i]:
                 neighbor_votes.append(self.y_train[index])
-            nvalues, nfreqs = myutils.get_frequencies(neighbor_votes,["this"],"this")
+            nvalues, nfreqs = myutils.get_frequencies(neighbor_votes)
             # Finding the class label with the maximum frequency, to get the majority vote
             try:
                 y_predicted.append(int(nvalues[nfreqs.index(max(nfreqs))]))
