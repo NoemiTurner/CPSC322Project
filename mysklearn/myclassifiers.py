@@ -114,7 +114,7 @@ class MyKNeighborsClassifier:
         distances = []
         all_distances = []
         neighbor_indices = []
-        neighbor_indices = []
+        toneighbor_indices = []
         # Calculates all X_train distances from the test instance
         for test_instance in X_test:
             for i, train_coordinates in enumerate(self.X_train):
@@ -127,11 +127,11 @@ class MyKNeighborsClassifier:
                 neighbor_indices.append(neighbor[0])
                 distances.append(neighbor[1])
             all_distances.append(distances)
-            neighbor_indices.append(neighbor_indices)
+            toneighbor_indices.append(neighbor_indices)
             distances = []
             neighbor_indices = []
             neighbors = []
-        return all_distances, neighbor_indices
+        return all_distances, toneighbor_indices
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -149,7 +149,7 @@ class MyKNeighborsClassifier:
         for i, test_instance in enumerate(X_test):
             for index in knn_indexes[i]:
                 neighbor_votes.append(self.y_train[index])
-            nvalues, nfreqs = myutils.get_frequencies(neighbor_votes,["this"],"this")
+            nvalues, nfreqs = myutils.get_frequencies(neighbor_votes)
             # Finding the class label with the maximum frequency, to get the majority vote
             try:
                 y_predicted.append(int(nvalues[nfreqs.index(max(nfreqs))]))
@@ -255,7 +255,8 @@ class MyNaiveBayesClassifier:
         frequencies = myutils.get_frequencies(y_train.copy())
         for index in range(len(frequencies[0])):
             priors.append(frequencies[1][index] / len(y_train))
-            posts.append([])
+            posts.append({})
+        
         self.priors = priors
         group_indexes = myutils.group_by_multiple_atts(indexes, y_train)
         index = 0
@@ -264,7 +265,9 @@ class MyNaiveBayesClassifier:
             for row in attribute_values:
                 for name in row:
                     count = myutils.get_num_instances(name, item, myutils.get_column(X_train, index_j))
-                    posts[index].append(count/len(item))
+                    posts[index].update({name: (count/len(item))})
+                    
+                
                 index_j += 1
             index_j = 0
             index += 1
@@ -284,7 +287,6 @@ class MyNaiveBayesClassifier:
         y_predicted = []
         posts = []
         indexes = []
-        predicts = []
 
         for item in X_test:
             posts = []
@@ -302,3 +304,114 @@ class MyNaiveBayesClassifier:
             indexes = myutils.find_max(posts)
             y_predicted.append(indexes)
         return y_predicted
+
+class MyDecisionTreeClassifier:
+    """Represents a decision tree classifier.
+ 
+    Attributes:
+        X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+        y_train(list of obj): The target y values (parallel to X_train).
+            The shape of y_train is n_samples
+        tree(nested list): The extracted tree model.
+ 
+    Notes:
+        Loosely based on sklearn's DecisionTreeClassifier:
+            https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+        Terminology: instance = sample = row and attribute = feature = column
+    """
+    def __init__(self):
+        """Initializer for MyDecisionTreeClassifier.
+        """
+        self.X_train = None
+        self.y_train = None
+        self.tree = None
+ 
+    def fit(self, X_train, y_train, F=None):
+        """Fits a decision tree classifier to X_train and y_train using the TDIDT
+        (top down induction of decision tree) algorithm.
+ 
+        Args:
+            X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+            y_train(list of obj): The target y values (parallel to X_train)
+                The shape of y_train is n_train_samples
+            F (int): used to constrain attribute selection and force diversity
+ 
+        Notes:
+            Since TDIDT is an eager learning algorithm, this method builds a decision tree model
+                from the training data.
+            Build a decision tree using the nested list representation described in class.
+            On a majority vote tie, choose first attribute value based on attribute domain ordering.
+            Store the tree in the tree attribute.
+            Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
+        """
+        headert = []
+        domain = []
+        domain_dict = {}
+        for i in range(len(X_train[0])):
+            att_num = str(i)
+            headert.append("att" + att_num)
+        self.header = headert
+        for i in range(len(X_train[0])):
+            for row in X_train:
+                domain.append(row[i])
+            domain_dict[headert[i]]= list(np.unique(domain))
+            domain = []
+        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        available_attributes = headert.copy()
+        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
+        
+    def predict(self, X_test):
+        """Makes predictions for test instances in X_test.
+ 
+        Args:
+            X_test(list of list of obj): The list of testing samples
+                The shape of X_test is (n_test_samples, n_features)
+ 
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test)
+        """
+        header = []
+        for i in range(len(X_test[0])):
+            att_num = str(i)
+            header.append("att" + att_num)
+        predictions = []
+        for item in X_test:
+            predictions.append(myutils.tdidt_predict(header, self.tree, item))
+        return predictions
+ 
+    def print_decision_rules(self, attribute_names=None, class_name="class"):
+        """Prints the decision rules from the tree in the format
+        "IF att == val AND ... THEN class = label", one rule on each line.
+ 
+        Args:
+            attribute_names(list of str or None): A list of attribute names to use in the decision rules
+                (None if a list is not provided and the default attribute names based on indexes
+                (e.g. "att0", "att1", ...) should be used).
+            class_name(str): A string to use for the class name in the decision rules
+                ("class" if a string is not provided and the default name "class" should be used).
+        """
+        myutils.print_tree_helper(self.tree, [], self.tree[0])
+ 
+    # BONUS method
+    def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):
+        """BONUS: Visualizes a tree via the open source Graphviz graph visualization package and
+        its DOT graph language (produces .dot and .pdf files).
+ 
+        Args:
+            dot_fname(str): The name of the .dot output file.
+            pdf_fname(str): The name of the .pdf output file generated from the .dot file.
+            attribute_names(list of str or None): A list of attribute names to use in the decision rules
+                (None if a list is not provided and the default attribute names based on indexes
+                (e.g. "att0", "att1", ...) should be used).
+ 
+        Notes:
+            Graphviz: https://graphviz.org/
+            DOT language: https://graphviz.org/doc/info/lang.html
+            You will need to install graphviz in the Docker container as shown in class to complete this method.
+        """
+        vis = gv.Graph(dot_fname,engine="dot",format="pdf")
+        tree = myutils.traverse_tree(self.tree,None,vis,num=0)
+        # output the vis as a pdf
+        vis.render(pdf_fname)
