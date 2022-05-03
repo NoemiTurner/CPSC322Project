@@ -131,6 +131,7 @@ class MyKNeighborsClassifier:
             distances = []
             neighbor_indices = []
             neighbors = []
+        print(all_distances, neighbor_indices)
         return all_distances, neighbor_indices
 
     def predict(self, X_test):
@@ -146,6 +147,7 @@ class MyKNeighborsClassifier:
         neighbor_votes = []
         y_predicted = []
         knn_distances, knn_indexes = self.kneighbors(X_test)
+        print(len(knn_indexes))
         for i, test_instance in enumerate(X_test):
             for index in knn_indexes[i]:
                 neighbor_votes.append(self.y_train[index])
