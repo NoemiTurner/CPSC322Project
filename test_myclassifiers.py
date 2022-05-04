@@ -11,10 +11,10 @@ attribute_domains = {"level": ["Senior", "Mid", "Junior"],
     "tweets": ["yes", "no"], 
     "phd": ["yes", "no"]}
 X_train = [
-    ["Senior", "Java", "no", "no"],
-    ["Senior", "Java", "no", "yes"],
-    ["Mid", "Python", "no", "no"],
-    ["Junior", "Python", "no", "no"],
+    ["Senior", "Java", "no", "no"], # used in predict()
+    ["Senior", "Java", "no", "yes"], # used in predict()
+    ["Mid", "Python", "no", "no"],  # used in predict()
+    ["Junior", "Python", "no", "no"], # used in predict()
     ["Junior", "R", "yes", "no"],
     ["Junior", "R", "yes", "yes"],
     ["Mid", "R", "yes", "yes"],
@@ -52,18 +52,22 @@ def test_random_forest_classifier_fit():
 # predict() is much more straightforward, use majority voting amongst the M trees to make a prediction 
 # for an unseen instance, asserting it is the correct instance based on the trees.
 def test_random_forest_classifier_predict():
-    N = 20
+    N = 4
     M = 7
     F = 2
     rfc = MyRandomForestClassifier(N, M, F)
     rfc.fit(X_train, y_train)
 
-    X_test = 0 # TODO: fill in correct data here
-    correct_prediction = 24 # TODO: fill in correct values here
+    X_test = [["Senior", "Java", "no", "no"],
+             ["Senior", "Java", "no", "yes"],
+             ["Mid", "Python", "no", "no"],
+             ["Junior", "Python", "no", "no"]]
+             
+    correct_predictions = ["False", "False", "True", "True"]
 
-    y_predicted = rfc.predict(X_test)
+    predictions = rfc.predict(X_test)
 
-    assert y_predicted == correct_prediction  # check that prediction is the correct instance based on the trees
+    assert predictions == correct_predictions 
 
 def test_kneighbors_classifier_kneighbors():
     my_knn = MyKNeighborsClassifier()

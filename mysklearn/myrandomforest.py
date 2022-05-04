@@ -84,22 +84,31 @@ class MyRandomForestClassifier:
         # (instead of simple majority voting). See the weighted majority voting lab tasks on Github to help 
         # with this bonus task. Compare your results to those w/simple majority voting.
 
-        predictions = [] # 2-D # 5X4 
-
+        predictions = [] 
+       
+        # for each element in X_test
         for element in X_test:
+            element_predictions = []
+            # for each tree in the forest
+            for tree in self.forest:
+                # get the prediction
+                element_predictions.append(tree.predict(element))
 
-        total_trees = len(self.forest)
+            # then do majority voting for the element in X_test 
+            element_predictions.sort()  # inplace
+            # parallel lists
+            values = []
+            counts = []
+            for value in element_predictions:
+                if value in values:  # seen it before
+                    counts[-1] += 1  # okay because sorted
+                else:  # haven't seen it before
+                    values.append(value)
+                    counts.append(1)
+            i = counts.index(max(counts)) # get the index of the predicton value that appears most frequently
+            
+            # append to predictions list
+            predictions.append(values[i])
 
-        # for each tree in the forest
-        for i in range(total_trees):
-            predictions.append(self.forest[i].predict(X_test))
-
-
-        values, counts = myutils.get_frequencies(predictions)
-
-        # choose the prediction values that appear most frequently? I think I'm doing this right?
-        p = counts.index(max(counts))
-
-        predictions = values[p]
-
+            
         return predictions # returns the predicted classes 
