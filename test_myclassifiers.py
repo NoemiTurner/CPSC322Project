@@ -1,28 +1,10 @@
 import numpy as np
+import random
 from mysklearn import myclassifiers, myutils
 from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier
 from mysklearn.myrandomforest import MyRandomForestClassifier
 
-# # interview dataset
-# HEADER_INTERVEIW = ["level", "lang", "tweets", "phd", "interviewed_well"]
-# X_TRAIN_INTERVIEW = [
-#     ["Senior", "Java", "no", "no"],
-#     ["Senior", "Java", "no", "yes"],
-#     ["Mid", "Python", "no", "no"],
-#     ["Junior", "Python", "no", "no"],
-#     ["Junior", "R", "yes", "no"],
-#     ["Junior", "R", "yes", "yes"],
-#     ["Mid", "R", "yes", "yes"],
-#     ["Senior", "Python", "no", "no"],
-#     ["Senior", "R", "yes", "no"],
-#     ["Junior", "Python", "yes", "no"],
-#     ["Senior", "Python", "yes", "yes"],
-#     ["Mid", "Python", "no", "yes"],
-#     ["Mid", "Java", "yes", "no"],
-#     ["Junior", "Python", "no", "yes"]
-# ]
-# Y_TRAIN_INTERVIEW = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
-
+# interview dataset
 header = ["level", "lang", "tweets", "phd"]
 attribute_domains = {"level": ["Senior", "Mid", "Junior"], 
     "lang": ["R", "Python", "Java"],
@@ -55,17 +37,33 @@ table = [X[i] + [y[i]] for i in range(len(X))]
 # Then seed your random number generator and see what attributes will be selected in the F-sized subsets 
 # and what bootstrap samples will be generated for that seed. Then you can determine what the N trees 
 # will look like and what the M best ones are based on the validation sets.
+def test_random_forest_classifier_fit():
+    N = 4
+    M = 3
+    F = 2
+    random_num = random.seed(0)
+    print("Random Number " , random_num)
+    rfc = MyRandomForestClassifier(N, M, F)
+    rfc.fit(X, y)
+    
+    # then assert against what the N trees will look like and 
+    # what the M best ones are based on the validation sets.
 
 # predict() is much more straightforward, use majority voting amongst the M trees to make a prediction 
 # for an unseen instance, asserting it is the correct instance based on the trees.
-
-def test_random_forest_classifier_fit():
-    rfc = MyRandomForestClassifier()
-    
-    assert False is True # TODO: fix this
-
 def test_random_forest_classifier_predict():
-    assert False is True # TODO: fix this
+    N = 20
+    M = 7
+    F = 2
+    rfc = MyRandomForestClassifier(N, M, F)
+    rfc.fit(X, y)
+
+    unseen_instance = 0 # TODO: fill in correct data here
+    correct_prediction = 24 # TODO: fill in correct values here
+
+    prediction = rfc.predict(unseen_instance)
+
+    assert prediction == correct_prediction  # check that prediction is the correct instance based on the trees
 
 def test_kneighbors_classifier_kneighbors():
     my_knn = MyKNeighborsClassifier()
