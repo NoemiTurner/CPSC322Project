@@ -360,7 +360,7 @@ class MyDecisionTreeClassifier:
             domain = []
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         available_attributes = headert.copy()
-        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
+        self.tree = myutils.tdidt_predict(train, available_attributes, domain_dict, headert, F)
         
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -394,7 +394,6 @@ class MyDecisionTreeClassifier:
         """
         myutils.print_tree_helper(self.tree, [], self.tree[0])
  
-    # BONUS method
     def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):
         """BONUS: Visualizes a tree via the open source Graphviz graph visualization package and
         its DOT graph language (produces .dot and .pdf files).
