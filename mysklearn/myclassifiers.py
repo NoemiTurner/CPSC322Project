@@ -359,7 +359,7 @@ class MyDecisionTreeClassifier:
             domain = []
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         available_attributes = header.copy()
-        self.tree = myutils.tdidt_predict(train, available_attributes, domain_dict, header, F)
+        self.tree = myutils.tdidt_predict(train, available_attributes, domain_dict, header)
         
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.

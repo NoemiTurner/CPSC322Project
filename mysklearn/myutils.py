@@ -269,7 +269,7 @@ def compute_bootstrapped_sample(table):
         sample.append(table[rand_index])
     return sample
 
-def random_forest_algorithm(current_instances, available_attributes, attribute_domains, header, F=None, random_state=None):
+def random_forest_algorithm(current_instances, available_attributes, attribute_domains, header):
     """Generatest the decision tree
         Args:
             current_instances : instances that haven't been made into a rule

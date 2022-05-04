@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from mysklearn import myclassifiers, myutils
+from mysklearn import myutils
 from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier
 from mysklearn.myrandomforest import MyRandomForestClassifier
 
@@ -62,7 +62,7 @@ def test_random_forest_classifier_predict():
              ["Senior", "Java", "no", "yes"],
              ["Mid", "Python", "no", "no"],
              ["Junior", "Python", "no", "no"]]
-             
+
     correct_predictions = ["False", "False", "True", "True"]
 
     predictions = rfc.predict(X_test)
