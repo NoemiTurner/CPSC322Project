@@ -7,11 +7,12 @@ def discritize_data_by_million(table):
     sorted table by the number of million in descending order.
     """
     money_index = table.column_names.index("earnings_($ million)")
+    cutoffs = compute_equal_width_cutoffs(table.get_column(money_index), 3)
     y = []
     for row in table.data:
-        if row[money_index] < 50:
+        if row[money_index] <= row[cutoffs[0]]:
             y.append("low")
-        if row[money_index] < 95:
+        if row[money_index] < row[cutoffs[1]]:
             y.append("medium")
         y.append("high")
     return y
