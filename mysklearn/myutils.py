@@ -259,27 +259,69 @@ def compute_random_subset(values, num_values, random_state=None):
     values_copy = values[:]  # shallow copy
     np.random.shuffle(values_copy)  # in place shuffle
     return values_copy[:num_values]
+    
+def compute_bootstrapped_sample(table):
+    n = len(table)
+    sample = []
+    for _ in range(n):
+        # Return random integers from low (inclusive) to high (exclusive)
+        rand_index = np.random.randint(0, n)
+        sample.append(table[rand_index])
+    return sample
 
-def majority_vote(att_partition):  # working for basic 1 element list
-    """Used to determine a clash
+def random_forest_algorithm(current_instances, available_attributes, attribute_domains, header, F=None, random_state=None):
+    """Generatest the decision tree
         Args:
-            att_partition : the attributes partitioned
+            current_instances : instances that haven't been made into a rule
+            available_attributes : attributes that can still be split on
         Returns:
-            the majority vote
+            the tree generated
         Notes:
-            needed for clashes in decision tree
+            is a recursive function
         """
-    majority = att_partition[0][-1]
-    majority_count = 0
-    for vote in att_partition:
-        vote_count = 0
-        for other_vote in att_partition:
-            if vote[-1] == other_vote[-1]:
-                vote_count += 1
-        if vote_count > majority_count:
-            majority = vote[-1]
-            majority_count = vote_count
-    return majority
+    if F == None:
+        attribute = select_attribute(
+            current_instances, available_attributes, header)
+    else:
+        K_subsets = compute_random_subset(
+            available_attributes, F)  # getting random subset
+        # print(K_subsets)
+        attribute = select_attribute(current_instances, K_subsets, header)
+        # print(attribute)
+    # attribute = select_attribute(current_instances, available_attributes, header)
+    available_attributes.remove(attribute)
+    tree = ["Attribute", attribute]
+    # group data by attribute domains (creates pairwise disjoint partitions)
+    partitions = partition_instances(
+        current_instances, attribute, attribute_domains, header)
+    # for each partition, repeat unless one of the following occurs (base case)
+    skip = False
+    for att_value, att_partition in partitions.items():
+        values_subtree = ["Value", att_value]
+    #    CASE 1: all class labels of the partition are the same => make a leaf node
+        if len(att_partition) > 0 and all_same_class(att_partition):
+            leaf_node = ["Leaf", att_partition[0][-1],
+                         len(att_partition), len(current_instances)]
+            values_subtree.append(leaf_node)
+    #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
+        elif (len(att_partition) > 0 and len(available_attributes) == 0):
+            label = majority_vote(att_partition)
+            leaf_node = ["Leaf", label, len(
+                att_partition), len(current_instances)]
+            values_subtree.append(leaf_node)
+    #    CASE 3: no more instances to partition (empty partition) => backtrack and replace attribute node with majority vote leaf node
+        elif len(att_partition) == 0:
+            skip = True
+            tree = ["Leaf", majority_vote(current_instances), len(
+                current_instances), len(current_instances)]  # need to fix len
+        else:  # previous conditions are all false... recurse!
+            subtree = tdidt(
+                att_partition, available_attributes.copy(), attribute_domains, header, F)
+            values_subtree.append(subtree)
+            # note the copy
+        if skip == False:
+            tree.append(values_subtree)
+    return tree
 
 def create_table_from_parallel_lists(original_table, list_of_parallel_lists):
     new_cols = []
@@ -291,18 +333,6 @@ def create_table_from_parallel_lists(original_table, list_of_parallel_lists):
         stats_cols_inner = []
     return new_cols
 
-def print_decision_rules_helper(tree):
-    if tree[0] == "Leaf":  # Leaf node case
-        print("THEN", tree[1])
-        return tree
-    else:
-        if tree[0] == "Attribute":
-            print("IF", tree[1], "=", tree[2][1], "AND", end=" ")
-        for node_index in range(len(tree)):
-            if node_index > 1:
-                print_decision_rules_helper(tree[node_index])
-                if tree[0] == "Attribute":
-                    print("IF", tree[1], "=", tree[2][1], "AND", end=" ")
 
 def convert_header_to_string(table):
     """ When the header is apart of the table, this is a good function to change just the header to a string
@@ -419,28 +449,8 @@ def all_same_class(attribute_partition):
         if attribute[-1] != label:
             return False
     return True
-# def majority_vote(att_partition): # working for basic 1 element list
-#     """Used to determine a clash
-#         Args:
-#             att_partition : the attributes partitioned
-#         Returns:
-#             the majority vote
-#         Notes:
-#             needed for clashes in decision tree
-#         """
-#     majority = att_partition[0][-1]
-#     majority_count = 0
-#     for vote in att_partition:
-#         vote_count = 0
-#         for other_vote in att_partition:
-#             if vote[-1] == other_vote[-1]:
-#                 vote_count += 1
-#         if vote_count > majority_count:
-#             majority = vote[-1]
-#             majority_count = vote_count
-#     return majority
 
-def tdidt(current_instances, available_attributes, attribute_domains, header, F=None, random_state=None):
+def tdidt(current_instances, available_attributes, attribute_domains, header):
     """Generatest the decision tree
         Args:
             current_instances : instances that haven't been made into a rule
@@ -493,8 +503,9 @@ def tdidt(current_instances, available_attributes, attribute_domains, header, F=
         if skip == False:
             tree.append(values_subtree)
     return tree
+
  
-def get_column_ben(table, col_index):
+def decision_tree_get_column_(table, col_index):
     """ gets the column from a passed in col_name
     Args:
         table: (list of lists) table of data to get column from
@@ -510,7 +521,7 @@ def get_column_ben(table, col_index):
     return col
 
 
-def group_by_ben(table, col_index):
+def decision_tree_group_by(table, col_index):
     """ groups the table by the passed in col_index
     Args:
         table: (list of lists) table of data to get column from
@@ -519,7 +530,7 @@ def group_by_ben(table, col_index):
         group_names: (list) list of group label names
         group_subtables: (list of lists) 2d list of each group subtable
     """
-    col = get_column_ben(table, col_index)
+    col = decision_tree_get_column_(table, col_index)
     # get a list of unique values for the column
     group_names = sorted(list(set(col)))  # 75, 76, 77
     group_subtables = [[] for _ in group_names]  # [[], [], []]
@@ -545,7 +556,7 @@ def select_attribute(instances, available_attributes, header):
     e_new_list = []
     # loops through each available attribute and groups data by each attribute
     for item in available_attributes:
-        group_names, group_subtables = group_by_ben(
+        group_names, group_subtables = decision_tree_group_by(
             instances, header.index(item))
         e_value_list = []
         num_values = []
@@ -554,7 +565,7 @@ def select_attribute(instances, available_attributes, header):
             curr_group = group_subtables[j]
             num_attributes = len(curr_group)
             num_values.append(num_attributes)
-            class_names, class_subtables = group_by_ben(
+            class_names, class_subtables = decision_tree_group_by(
                 curr_group, len(curr_group[0])-1)
             e_value = 0
             # checks for empty partition for log base 2 of 0 calculations
@@ -697,13 +708,6 @@ def split_folds_to_train_test(folds):
         X_train_fold = []
     return X_train_folds, X_test_folds
 
-def normal_round(n):
-    """ Simple rounding function that accepts a number and correctly rounds it up
-    or down as you would typically expect.
-    """
-    if n - math.floor(n) < 0.5:
-        return math.floor(n)
-    return math.ceil(n)
 
 def display_train_test(label, X_train, X_test, y_train, y_test):
     """
@@ -736,36 +740,36 @@ def randomize_in_place(alist, parallel_list=None, random_state=0):
             parallel_list[i], parallel_list[rand_index] =\
             parallel_list[rand_index], parallel_list[i]
 
-def group_by(table, header, groupby_col_name):
-    """Computes subtables specific to various attribute values of the column requested. So, if the
-        column to be grouped by contains 3 different attribute options there will be 3 tables.
-        Args:
-            table (list of numeric vals): The list of x values
-            header (list of numeric vals): The list of y values
-            group_by_col_name (obj): The string name of the column to be grouped by
-        Returns:
-            group_names (list of obj) string for each attribute used for grouping
-            group_subtables (list of list of obj) list of tables, each should have only a single attribute in
-            the given groupby_col_name
-    """
-    groupby_col_index = header.index(groupby_col_name)  # use this later
-    if len(header) > 1:
-        groupby_col = get_column(table, header, groupby_col_name)
-    else:
-        groupby_col = table
-    group_names = sorted(list(set(groupby_col)))  # e.g. [75, 76, 77]
-    group_subtables = [[] for _ in group_names]  # e.g. [[], [], []]
-    for row in table:
-        if len(header) > 1:
-            groupby_val = row[groupby_col_index]  # e.g. this row's modelyear
-        else:
-            groupby_val = row
-        # which subtable does this row belong?
-        groupby_val_subtable_index = group_names.index(groupby_val)
-        if len(header) > 1:
-            group_subtables[groupby_val_subtable_index].append(
-                row.copy())  # make a copy
-        else:
-            group_subtables[groupby_val_subtable_index].append(
-                row)  # make a copy
-    return group_names, group_subtables
+# def group_by(table, header, groupby_col_name):
+#     """Computes subtables specific to various attribute values of the column requested. So, if the
+#         column to be grouped by contains 3 different attribute options there will be 3 tables.
+#         Args:
+#             table (list of numeric vals): The list of x values
+#             header (list of numeric vals): The list of y values
+#             group_by_col_name (obj): The string name of the column to be grouped by
+#         Returns:
+#             group_names (list of obj) string for each attribute used for grouping
+#             group_subtables (list of list of obj) list of tables, each should have only a single attribute in
+#             the given groupby_col_name
+#     """
+#     groupby_col_index = header.index(groupby_col_name)  # use this later
+#     if len(header) > 1:
+#         groupby_col = get_column(table, header, groupby_col_name)
+#     else:
+#         groupby_col = table
+#     group_names = sorted(list(set(groupby_col)))  # e.g. [75, 76, 77]
+#     group_subtables = [[] for _ in group_names]  # e.g. [[], [], []]
+#     for row in table:
+#         if len(header) > 1:
+#             groupby_val = row[groupby_col_index]  # e.g. this row's modelyear
+#         else:
+#             groupby_val = row
+#         # which subtable does this row belong?
+#         groupby_val_subtable_index = group_names.index(groupby_val)
+#         if len(header) > 1:
+#             group_subtables[groupby_val_subtable_index].append(
+#                 row.copy())  # make a copy
+#         else:
+#             group_subtables[groupby_val_subtable_index].append(
+#                 row)  # make a copy
+#     return group_names, group_subtables
