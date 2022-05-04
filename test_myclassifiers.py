@@ -10,7 +10,7 @@ attribute_domains = {"level": ["Senior", "Mid", "Junior"],
     "lang": ["R", "Python", "Java"],
     "tweets": ["yes", "no"], 
     "phd": ["yes", "no"]}
-X = [
+X_train = [
     ["Senior", "Java", "no", "no"],
     ["Senior", "Java", "no", "yes"],
     ["Mid", "Python", "no", "no"],
@@ -27,7 +27,7 @@ X = [
     ["Junior", "Python", "no", "yes"]
 ]
 
-y = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+y_train = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
 # stitch X and y together to make one table
 table = [X[i] + [y[i]] for i in range(len(X))]
 
@@ -44,8 +44,8 @@ def test_random_forest_classifier_fit():
     random_num = random.seed(0)
     print("Random Number " , random_num)
     rfc = MyRandomForestClassifier(N, M, F)
-    rfc.fit(X, y)
-    
+    rfc.fit(X_train, y_train)
+
     # then assert against what the N trees will look like and 
     # what the M best ones are based on the validation sets.
 
@@ -56,14 +56,14 @@ def test_random_forest_classifier_predict():
     M = 7
     F = 2
     rfc = MyRandomForestClassifier(N, M, F)
-    rfc.fit(X, y)
+    rfc.fit(X_train, y_train)
 
-    unseen_instance = 0 # TODO: fill in correct data here
+    X_test = 0 # TODO: fill in correct data here
     correct_prediction = 24 # TODO: fill in correct values here
 
-    prediction = rfc.predict(unseen_instance)
+    y_predicted = rfc.predict(X_test)
 
-    assert prediction == correct_prediction  # check that prediction is the correct instance based on the trees
+    assert y_predicted == correct_prediction  # check that prediction is the correct instance based on the trees
 
 def test_kneighbors_classifier_kneighbors():
     my_knn = MyKNeighborsClassifier()

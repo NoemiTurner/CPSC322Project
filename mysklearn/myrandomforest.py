@@ -57,16 +57,16 @@ class MyRandomForestClassifier:
         
         return self
     
-    def predict(self, unseen_instance):
+    def predict(self, X_test):
         """
         Predict class for an unseen instance
         """
-        predicted = []
+        y_predicted = []
 
         # use majority voting amongst the M trees to make a prediction 
         # for an unseen instance, asserting it is the correct instance based on the trees.
         
-        return predicted # returns the predicted classes 
+        return y_predicted # returns the predicted classes 
 
 
     # Define a python function that selects F random attributes
