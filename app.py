@@ -14,7 +14,7 @@ def index():
 
 @app.route("/predict", methods=['GET'])
 def predict():
-    dummy = MyDummyClassifier()
+    knn = MyKNeighborsClassifier(n_neighbors=10)
     data = MyPyTable()
     data.load_from_file("input_data/forbes_data.csv")
     num_rows, num_cols = data.get_shape()
@@ -23,29 +23,35 @@ def predict():
     combined_data = []
     sport = utils.get_column(data.data, data.column_names, "Sport")
     country = utils.get_column(data.data, data.column_names, "Nationality")
+    sport_values, sport_counts = utils.get_frequencies(data.data, data.column_names, "Sport")
+    country_values, country_counts = utils.get_frequencies(data.data, data.column_names, "Nationality")
+    # make all lower to stay consistent with other tags
     for i in range(len(sport)):
         country[i] = country[i].lower()
         sport[i] = sport[i].lower()
         combined_data.append([country[i], sport[i]])
-    new_Xtrain = []
-    for item in combined_data:
-        new_Xtrain.append(item)
-    dummy.fit(combined_data, y_data)
+    
+    # transform the sports and nationalities to numbers
+    for index, value in enumerate(sport_values):
+        for row in range(len(combined_data)):
+            if combined_data[row][1] == value:
+                combined_data[row][1] = index + 1
+    for index, single_country in enumerate(country_values):
+        for row in range(len(combined_data)):
+            if combined_data[row][0] == single_country:
+                combined_data[row][0] = index + 1
+    knn.fit(combined_data, y_data)
 
     nationality = request.args.get('nationality', "")
     sport = request.args.get('sport', "")
     print(nationality, sport)
     # input the arguments into the best classifier
     # get the result and return it
-    prediction = dummy.predict([nationality, sport])
+    prediction = knn.predict([nationality, sport])
     if prediction is not None:
         result = {"prediction": prediction}
         return jsonify(result), 200
     return "Error making prediction", 400
 
-def set_up_data():
-    pass
-
 if __name__ == "__main__":
-    #port = os.eviron.get("PORT", 5000)
     app.run(debug=False, port=3000, host="0.0.0.0")
