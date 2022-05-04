@@ -32,28 +32,25 @@ class MyRandomForestClassifier:
     # call compute_random_subset() right before a call to
     # select_attribute() in tdidt pass the return subset
     # (size F) into select_attribute()
-
     def fit(self, X_train, y_train):
         """
         Build a forest of trees from the training set (X, y)
         """
         # 1. Generate a random stratified test set consisting of one third of the original data set, 
         # with the remaining two thirds of the instances forming the "remainder set".
-        remainder_set = 0
-        random_stratified_test_set = 0
+        remainder_set = []
+        random_stratified_test_set = []
 
         # 2. Generate N "random" decision trees using bootstrapping (giving a training and validation set)
         #  over the remainder set. At each node, build your decision trees by randomly selecting F of the 
         #  remaining attributes as candidates to partition on. This is the standard random forest approach 
         #  discussed in class. Note that to build your decision trees you should still use entropy; 
         #  however, you are selecting from only a (randomly chosen) subset of the available attributes.
+        training_set = []
+        validation_set = []
+        # TODO: modify and make a new version of tdidt() and insert here
 
-        # 3. Select the M most accurate of the N decision trees using the corresponding validation sets.
-
-        # 4. Use simple majority voting to predict classes using the M decision trees over the test set.
-        # BONUS (2 pts): Modify your random forest algorithm to use the "track record" weighted voting scheme 
-        # (instead of simple majority voting). See the weighted majority voting lab tasks on Github to help 
-        # with this bonus task. Compare your results to those w/simple majority voting.
+        # 3. Select the M most accurate of the N decision trees using the corresponding validation sets
         
         return self
     
@@ -62,6 +59,11 @@ class MyRandomForestClassifier:
         Predict class for an unseen instance
         """
         y_predicted = []
+        
+        # 4. Use simple majority voting to predict classes using the M decision trees over the test set.
+        # BONUS (2 pts): Modify your random forest algorithm to use the "track record" weighted voting scheme 
+        # (instead of simple majority voting). See the weighted majority voting lab tasks on Github to help 
+        # with this bonus task. Compare your results to those w/simple majority voting.
 
         # use majority voting amongst the M trees to make a prediction 
         # for an unseen instance, asserting it is the correct instance based on the trees.

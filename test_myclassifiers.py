@@ -29,7 +29,7 @@ X_train = [
 
 y_train = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
 # stitch X and y together to make one table
-table = [X[i] + [y[i]] for i in range(len(X))]
+table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
 
 
 # For testing your MyRandomForestClassifier fit() I recommend using a small dataset from PA7's test 
@@ -45,7 +45,7 @@ def test_random_forest_classifier_fit():
     print("Random Number " , random_num)
     rfc = MyRandomForestClassifier(N, M, F)
     rfc.fit(X_train, y_train)
-
+    
     # then assert against what the N trees will look like and 
     # what the M best ones are based on the validation sets.
 
