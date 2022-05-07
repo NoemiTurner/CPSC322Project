@@ -251,11 +251,7 @@ def get_most_common(col):
     max_count = counts.index(max(counts))
     return values[max_count]
 
-def compute_random_subset(values, num_values, random_state=None):
-    # used for F in RandomForest
-    # there is a function np.random.choice()
-    if random_state is not None:
-        np.random.seed(random_state)
+def compute_random_subset(values, num_values):
     values_copy = values[:]  # shallow copy
     np.random.shuffle(values_copy)  # in place shuffle
     return values_copy[:num_values]

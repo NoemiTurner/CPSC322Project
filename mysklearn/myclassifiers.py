@@ -345,21 +345,7 @@ class MyDecisionTreeClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
-        header = []
-        domain = []
-        domain_dict = {}
-        for i in range(len(X_train[0])):
-            att_num = str(i)
-            header.append("att" + att_num)
-        self.header = header
-        for i in range(len(X_train[0])):
-            for row in X_train:
-                domain.append(row[i])
-            domain_dict[header[i]]= list(np.unique(domain))
-            domain = []
-        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        available_attributes = header.copy()
-        self.tree = myutils.tdidt_predict(train, available_attributes, domain_dict, header)
+        self.tree = []
         
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -372,12 +358,7 @@ class MyDecisionTreeClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         header = []
-        for i in range(len(X_test[0])):
-            att_num = str(i)
-            header.append("att" + att_num)
         predictions = []
-        for item in X_test:
-            predictions.append(myutils.tdidt_predict(header, self.tree, item))
         return predictions
 
 
@@ -395,25 +376,18 @@ class MyRandomForestClassifier:
             https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
         Terminology: instance = sample = row and attribute = feature = column
     """
-    def __init__(self, N, M, F):
+    def __init__(self, N, F):
         """Initializer for MyDecisionTreeClassifier.
         """
         self.X_train = None
         self.y_train = None
         self.N = N # the number of trees in the forest
-        self.M = M # the number of classifiers
+        self.M = 0 # the number of the best classifiers
         self.F = F # size of the random subsets of attributes
         self.forest = None
         self.header = []
 
 
-    # implement a random forest (all learners are trees)
-    # with bagging and with random attribute subsets
-    # will need to modify tree generation: for each node 
-    # in our tree, we use random attribute subsets.
-    # call compute_random_subset() right before a call to
-    # select_attribute() in tdidt pass the return subset
-    # (size F) into select_attribute()
     def fit(self, X_train, y_train):
         """
         Build a forest of trees from the training set (X, y)
@@ -443,7 +417,6 @@ class MyRandomForestClassifier:
         X_indexes = list(range(len(self.X_train))) # I feel like I need this
         y_indexes = list(range(len(self.y_train))) # I feel like I need this too? :)
 
-        sample = myutils.compute_bootstrapped_sample(train) # no sure where to use this? Maybe in modified tdidt()
 
         for i in range(self.N):
             
@@ -458,10 +431,6 @@ class MyRandomForestClassifier:
         """
         Predict class for the unseen instances
         """
-        # 4. Use simple majority voting to predict classes using the M decision trees over the test set.
-        # BONUS (2 pts): Modify your random forest algorithm to use the "track record" weighted voting scheme 
-        # (instead of simple majority voting). See the weighted majority voting lab tasks on Github to help 
-        # with this bonus task. Compare your results to those w/simple majority voting.
 
         predictions = [] 
        

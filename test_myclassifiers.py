@@ -10,63 +10,140 @@ attribute_domains = {"level": ["Senior", "Mid", "Junior"],
     "tweets": ["yes", "no"], 
     "phd": ["yes", "no"]}
 X_train = [
-    ["Senior", "Java", "no", "no"], # used in predict()
-    ["Senior", "Java", "no", "yes"], # used in predict()
-    ["Mid", "Python", "no", "no"],  # used in predict()
-    ["Junior", "Python", "no", "no"], # used in predict()
+    ["Senior", "Java", "no", "no"], 
+    ["Senior", "Java", "no", "yes"], 
+    ["Mid", "Python", "no", "no"],  
+    ["Junior", "Python", "no", "no"], 
     ["Junior", "R", "yes", "no"],
     ["Junior", "R", "yes", "yes"],
     ["Mid", "R", "yes", "yes"],
     ["Senior", "Python", "no", "no"],
     ["Senior", "R", "yes", "no"],
-    ["Junior", "Python", "yes", "no"],
-    ["Senior", "Python", "yes", "yes"],
-    ["Mid", "Python", "no", "yes"],
-    ["Mid", "Java", "yes", "no"],
-    ["Junior", "Python", "no", "yes"]
+    ["Junior", "Python", "yes", "no"]
 ]
 
-y_train = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+y_train = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True"]
 # stitch X and y together to make one table
 table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
 
+X_test = [["Senior", "Python", "yes", "yes"], # used in predict()
+        ["Mid", "Python", "no", "yes"], # used in predict()
+        ["Mid", "Java", "yes", "no"], # used in predict()
+        ["Junior", "Python", "no", "yes"]] # used in predict()
+y_test = ["True", "True", "True", "False"]
 
-# For testing your MyRandomForestClassifier fit() I recommend using a small dataset from PA7's test 
-# cases that you can easily calculate entropy for. Then choose small values of N, M, and F. 
-# Then seed your random number generator and see what attributes will be selected in the F-sized subsets 
-# and what bootstrap samples will be generated for that seed. Then you can determine what the N trees 
-# will look like and what the M best ones are based on the validation sets.
+
 def test_random_forest_classifier_fit():
     N = 4
-    M = 3
+    M = 2
     F = 2
-    random_num = random.seed(0)
-    print("Random Number " , random_num)
-    rfc = MyRandomForestClassifier(N, M, F)
-    rfc.fit(X_train, y_train)
+
+    random_subsets = []
+    np.random.seed(0)
     
-    # then assert against what the N trees will look like and 
-    # what the M best ones are based on the validation sets.
+    for i in range(N):
+        random_subsets.append(myutils.compute_random_subset(header, F))
+
+    print(random_subsets)
+    # [['tweets', 'phd'], ['level', 'tweets'], ['phd', 'level'], ['lang', 'level']]
+
+    # boot strapped samples:
+    sample1 = myutils.compute_bootstrapped_sample(table)
+    sample2 = myutils.compute_bootstrapped_sample(table)
+    sample3 = myutils.compute_bootstrapped_sample(table)
+    sample4 = myutils.compute_bootstrapped_sample(table)
+
+    # Sample 1
+    # ['Senior', 'R', 'yes', 'no', 'True']
+    # ['Senior', 'Java', 'no', 'yes', 'False']
+    # ['Mid', 'R', 'yes', 'yes', 'True']
+    # ['Senior', 'Python', 'no', 'no', 'False']
+    # ['Senior', 'Python', 'no', 'no', 'False']
+    # ['Senior', 'R', 'yes', 'no', 'True']
+    # ['Senior', 'Java', 'no', 'yes', 'False']
+    # ['Junior', 'R', 'yes', 'yes', 'False']
+    # ['Junior', 'Python', 'yes', 'no', 'True']
+    # ['Senior', 'R', 'yes', 'no', 'True']
+
+    # Sample 2
+    # ['Junior', 'Python', 'yes', 'no', 'True']
+    # ['Junior', 'R', 'yes', 'no', 'True']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Junior', 'R', 'yes', 'yes', 'False']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+    # ['Mid', 'Python', 'no', 'no', 'True']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Senior', 'R', 'yes', 'no', 'True']
+
+    # # Sample 3
+    # ['Senior', 'Java', 'no', 'yes', 'False']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Senior', 'Python', 'no', 'no', 'False']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+    # ['Senior', 'Java', 'no', 'yes', 'False']
+    # ['Junior', 'Python', 'yes', 'no', 'True']
+    # ['Junior', 'Python', 'yes', 'no', 'True']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+
+    # # Sample 4
+    # ['Junior', 'R', 'yes', 'no', 'True']
+    # ['Senior', 'Python', 'no', 'no', 'False']
+    # ['Junior', 'Python', 'no', 'no', 'True']
+    # ['Mid', 'Python', 'no', 'no', 'True']
+    # ['Senior', 'Python', 'no', 'no', 'False']
+    # ['Mid', 'Python', 'no', 'no', 'True']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+    # ['Senior', 'Java', 'no', 'no', 'False']
+    # ['Junior', 'R', 'yes', 'no', 'True']
+    # ['Junior', 'R', 'yes', 'yes', 'False']
+
+    # Tree 1: 
+    tree_1 = []
+    
+    tree_2 = []
+
+    tree_3 = []
+    
+    tree_4 = []
+
+    myforest = []
+    myforest.append(tree_1)
+    myforest.append(tree_2)
+    myforest.append(tree_3)
+    myforest.append(tree_4)
+
+    rfc = MyRandomForestClassifier(N, F)
+    rfc.fit(X_train, y_train)
+    assert rfc.M ==  M
+    assert np.allclose(rfc.forest, myforest)
+
 
 # predict() is much more straightforward, use majority voting amongst the M trees to make a prediction 
 # for an unseen instance, asserting it is the correct instance based on the trees.
 def test_random_forest_classifier_predict():
+    # predict test #1
     N = 4
-    M = 7
+    M = 2
     F = 2
     rfc = MyRandomForestClassifier(N, M, F)
     rfc.fit(X_train, y_train)
 
-    X_test = [["Senior", "Java", "no", "no"],
-             ["Senior", "Java", "no", "yes"],
-             ["Mid", "Python", "no", "no"],
-             ["Junior", "Python", "no", "no"]]
+    predictions1 = rfc.predict(X_test)
+    assert predictions1 == y_test
 
-    correct_predictions = ["False", "False", "True", "True"]
+    # predict test #2
+    N = 20
+    M = 7
+    F = 3
+    rfc = MyRandomForestClassifier(N, M, F)
+    rfc.fit(X_train, y_train)
 
-    predictions = rfc.predict(X_test)
-
-    assert predictions == correct_predictions 
+    predictions2 = rfc.predict(X_test)
+    assert predictions2 == y_test
 
 
 def test_kneighbors_classifier_kneighbors():
