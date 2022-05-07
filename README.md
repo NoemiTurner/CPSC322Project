@@ -21,5 +21,12 @@ In the main directory, there is a file which is used to create the Flask app tit
 # How the Project is Organized
 
 <h3> Main Directory </h3> 
+-The input_data directory <br>
+-The Jupyter Notebooks <br> (EDA.ipynb, project_proposal.ipynb)
+-The output directory <br>
+-Flask App (app.py) <br>
+-The test file (test_myclassifiers.py) <br>
+-Utility files used in EDA.ipynb (utils.py, plot_utils.py, mypytable.py)
 
-<h3> Main Directory </h3> 
+<h3> mysklearn Directory </h3> 
+-Holds all of the files needed to use the classifiers
