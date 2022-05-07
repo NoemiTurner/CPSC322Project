@@ -69,6 +69,7 @@ def test_random_forest_classifier_predict():
 
     assert predictions == correct_predictions 
 
+
 def test_kneighbors_classifier_kneighbors():
     my_knn = MyKNeighborsClassifier()
 
