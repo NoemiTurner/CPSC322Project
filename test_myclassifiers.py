@@ -1,5 +1,4 @@
 import numpy as np
-<<<<<<< HEAD
 import random
 from mysklearn import myutils
 from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier
@@ -69,6 +68,7 @@ def test_random_forest_classifier_predict():
     predictions = rfc.predict(X_test)
 
     assert predictions == correct_predictions 
+
 
 def test_kneighbors_classifier_kneighbors():
     my_knn = MyKNeighborsClassifier()
@@ -423,15 +423,3 @@ def test_naive_bayes_classifier_predict():
     for item in indexes:
         naive_predictions.append(labels[item])
     assert np.array_equal(prediction, naive_predictions)
-=======
-
-from mysklearn.myclassifiers import MyDecisionTreeClassifier
-
-# TODO: copy your test_myclassifiers.py solution from PA4-6 here
-
-def test_random_forest_classifier_fit():
-    assert False is True # TODO: fix this
-
-def test_random_forest_classifier_predict():
-    assert False is True # TODO: fix this
->>>>>>> 2808c1a793baed00c175478f4e606a1291203af1
