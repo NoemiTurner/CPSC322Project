@@ -1,8 +1,7 @@
 import numpy as np
 import random
 from mysklearn import myutils
-from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier
-from mysklearn.myrandomforest import MyRandomForestClassifier
+from mysklearn.myclassifiers import MyKNeighborsClassifier, MyDummyClassifier, MyNaiveBayesClassifier, MyRandomForestClassifier
 
 # interview dataset
 header = ["level", "lang", "tweets", "phd"]
