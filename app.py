@@ -42,6 +42,8 @@ def predict():
                 combined_data[row][0] = index + 1
     knn.fit(combined_data, y_data)
 
+    # ***** Prediction Part ***** 
+
     nationality = request.args.get('nationality', "")
     sport = request.args.get('sport', "")
     print(nationality, sport)
