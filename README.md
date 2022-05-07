@@ -19,3 +19,7 @@ In the main directory, there is a file which is used to create the Flask app tit
 
 
 # How the Project is Organized
+
+<h3> Main Directory </h3> 
+
+<h3> Main Directory </h3> 
